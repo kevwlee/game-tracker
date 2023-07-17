@@ -7,9 +7,11 @@
   <body>
     <h1>Enter Number of Teams</h1>
     <div>
-      <input type="number" id="numberOfTeams" placeholder="Enter a number" />
-      <button onclick="submitNumberOfTeams()">Submit</button>
-      <button onclick="clearPage()">Clear</button>
+      <form action="#">
+        <input type="number" id="numberOfTeams" placeholder="Enter a number" />
+        <button type="submit" onclick="submitNumberOfTeams()">Submit</button>
+        <button onclick="clearPage()">Clear</button>
+      </form>
     </div>
     <div id="teamFieldsContainer"></div>
     <div>
@@ -17,6 +19,7 @@
         Process Form
       </button>
     </div>
+    <div id="groupDisplayContainer"></div>
     <script src="js/script.js"></script>
   </body>
 </html>
