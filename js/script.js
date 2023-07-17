@@ -28,7 +28,7 @@ function submitNumberOfTeams() {
 function createTeamFields() {
   var numberOfTeams = parseInt(document.getElementById("numberOfTeams").value);
   var teamContainer = document.getElementById("teamFieldsContainer");
-  container.innerHTML = "";
+  teamContainer.innerHTML = "";
 
   for (var i = 0; i < numberOfTeams; i++) {
     var teamDiv = document.createElement("div");
