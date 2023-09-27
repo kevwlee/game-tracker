@@ -122,18 +122,23 @@ function processForm() {
 function clearPage() {
   document.getElementById("numberOfTeams").value = "";
   document.getElementById("teamFieldsContainer").innerHTML = "";
+  document.getElementById("groupDisplayContainer").innerHTML = "";
   document.getElementById("processButton").style.display = "none";
+
   submitButton.disabled = false;
   numberOfTeamsInput.disabled = false;
   processButton.disabled = false;
+  teams = [];
 }
 
 function matchMaker(teams) {
-  var numberOfMatchesPerRound = Math.ceil((numberOfTeams * 2) / 4);
-  var playerArray = [];
-  var group = Array.from({ length: numberOfMatchesPerRound }, () => []);
-  console.log("group array init: ", group);
-  console.log("number of Matches per Round: ", numberOfMatchesPerRound);
+  var numGroups = Math.ceil((numberOfTeams * 2) / 4);
+  var allPlayers = [];
+  var backupPlayerArray = [];
+  var currentGroupToFillIndex = 0;
+  var groups = Array.from({ length: numGroups }, () => []);
+  console.log("group array init: ", groups);
+  console.log("number of groups: ", numGroups);
 
   // building array of players
   for (var k = 0; k < teams.length; k++) {
@@ -146,59 +151,68 @@ function matchMaker(teams) {
       teamName: teams[k].teamName,
     };
 
-    playerArray.push(player1);
-    playerArray.push(player2);
+    allPlayers.push(player1);
+    allPlayers.push(player2);
   }
 
-  console.log("playerArray: ", playerArray);
+  backupPlayerArray = [...allPlayers];
+
+  console.log("allPlayers: ", allPlayers.length);
+  console.log("backupPlayerArray: ", backupPlayerArray);
 
   // putting random player into groups - starting with 1
-  var emergencyExit = 0;
-  while (playerArray.length > 0) {
-    console.log("-----------------------------------------------------");
-    if (emergencyExit == 100) {
-      return;
+  let limitTracker = -1;
+  const limit = allPlayers.length * numGroups;
+
+  while (allPlayers.length > 0) {
+    limitTracker++;
+
+    if (currentGroupToFillIndex >= numGroups) {
+      currentGroupToFillIndex = 0;
     }
-    for (var j = 0; j < numberOfMatchesPerRound; j++) {
-      if (playerArray.length == 0 || emergencyExit == 100) {
-        continue;
-      } else {
-        var randIndex = getRandomInt(playerArray.length);
-        console.log("Grabing this Player: ", playerArray[randIndex]);
-        console.log("and opening Group ", randIndex, " to put Player in");
-        var hasTeamMate = group[j].some(
-          (teamName) => teamName.teamName === playerArray[randIndex].teamName
-        );
+    const currentGroup = groups[currentGroupToFillIndex];
 
-        console.log(
-          "is someone from his team already in this group? - ",
-          hasTeamMate
-        );
-        console.log("player is: ", playerArray[randIndex]);
-
-        if (!hasTeamMate) {
-          group[j].push(playerArray[randIndex]);
-          console.log(
-            "putting player: ",
-            playerArray[randIndex],
-            " into group: ",
-            group[j],
-            " and removing him from playerArray"
-          );
-          playerArray.splice(randIndex, 1);
-          console.log("Number of players left in Array: ", playerArray.length);
-        } else {
-          emergencyExit++;
-          console.log("counter for Emergency Exit: ", emergencyExit);
-          continue;
-          // playerArray.splice(randIndex, 1);
+    if (currentGroup.length < 4) {
+      // if the latest created group has less than maxPlayersPerGroup
+      // add a Player to latest created Group
+      const randomPlayerIndex = Math.floor(Math.random() * allPlayers.length);
+      const { teamName, name } = allPlayers[randomPlayerIndex];
+      const hasGroupThisPlayerWithThisTeamName = !!currentGroup.find(
+        (player) => {
+          return player.teamName === teamName;
         }
+      );
+
+      if (hasGroupThisPlayerWithThisTeamName) {
+        if (limitTracker >= limit) {
+          // we're in an infinite loop – log relevant info for debugging and break out of it!
+          console.log(
+            `::hasGroupThisPlayerWithThisTeamName::
+          teamId: "${teamName}"
+          name: "${name}"
+          `,
+            allPlayers
+          );
+          //        break;
+          allPlayers = [...backupPlayerArray];
+          groups = [...new Array(numGroups)].map((i) => []);
+          limitTracker = -1;
+          console.log(
+            "----------------erasing variables to start from scratch-----------------"
+          );
+        }
+
+        continue;
       }
+
+      const [randomPlayer] = allPlayers.splice(randomPlayerIndex, 1);
+      currentGroup.push(randomPlayer);
     }
+
+    currentGroupToFillIndex++;
   }
-  for (var l = 0; l < group.length; l++) {
-    console.log("group ", l + 1, ": ", group[l]);
-  }
+  createGroupContainer(groups);
+  backupPlayerArray = [];
 }
 
 function getRandomInt(max) {
@@ -206,8 +220,39 @@ function getRandomInt(max) {
 }
 
 function createGroupContainer(groupArray) {
-  var groupDisplayContainer = document.getElementById("groupContainer");
+  console.log("Creating Space for the Groups...");
+  var groupDisplayContainer = document.getElementById("groupDisplayContainer");
   groupDisplayContainer.innerHTML = "";
 
-  for (var i = 0; i < groupArray.length; i++) {}
+  console.log("entering loop for creating the lists...");
+  for (var i = 0; i < groupArray.length; i++) {
+    console.log("creating DIV for Group ", i + 1);
+    var groupDiv = document.createElement("div");
+    groupDiv.classList.add("group-container");
+
+    var groupLabel = document.createElement("label");
+    groupLabel.textContent = "Group " + (i + 1) + ":";
+
+    var groupList = document.createElement("ul");
+    console.log("creating list Items...");
+
+    for (var j = 0; j < groupArray[i].length; j++) {
+      console.log("Picking following Player: ", groupArray[i][j].playerName);
+      var player = document.createElement("li");
+      player.innerHTML =
+        groupArray[i][j].playerName +
+        " (Team: " +
+        groupArray[i][j].teamName +
+        ")";
+      console.log("appending player: ", player);
+      groupList.appendChild(player);
+    }
+
+    console.log("List for this group looks like this: ", groupList);
+    console.log("creating of group List done. Appending child");
+
+    groupDiv.appendChild(groupLabel);
+    groupDiv.appendChild(groupList);
+    groupDisplayContainer.appendChild(groupDiv);
+  }
 }
