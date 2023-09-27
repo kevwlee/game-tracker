@@ -2,24 +2,39 @@
 <html>
   <head>
     <title>My Gametracker</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../css/styles.css" />
   </head>
   <body>
-    <h1>Enter Number of Teams</h1>
-    <div>
-      <form action="#">
-        <input type="number" id="numberOfTeams" placeholder="Enter a number" />
-        <button type="submit" onclick="submitNumberOfTeams()">Submit</button>
-        <button onclick="clearPage()">Clear</button>
-      </form>
+    <div class="container">
+      <h1>Custom Gametracker: Kevin Lee Edition</h1>
+      <h2>Enter the number of teams:</h2>
+      <div class="input-teams">
+        <form action="#">
+          <input
+            type="number"
+            id="numberOfTeams"
+            placeholder="Enter a number"
+          />
+          <button type="submit" onclick="submitNumberOfTeams()">Submit</button>
+          <button onclick="clearPage()">Clear</button>
+        </form>
+        <br />
+      </div>
+      <div class="team-container" id="teamFieldsContainer"></div>
+      <br />
+      <div>
+        <button
+          id="processButton"
+          onclick="processForm()"
+          style="display: none"
+        >
+          Process Form
+        </button>
+      </div>
+      <br />
+      <div id="groupDisplayContainer" class="groupDisplayContainer"></div>
     </div>
-    <div id="teamFieldsContainer"></div>
-    <div>
-      <button id="processButton" onclick="processForm()" style="display: none">
-        Process Form
-      </button>
-    </div>
-    <div id="groupDisplayContainer"></div>
+
     <script src="js/script.js"></script>
   </body>
 </html>
