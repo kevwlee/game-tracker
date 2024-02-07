@@ -105,6 +105,8 @@ function processForm() {
       player1Name: player1Name,
       player2Name: player2Name,
       gamesPlayed: 0,
+      player1Score: 0,
+      player2Score: 0,
       totalScore: 0,
       player1Group: null,
       player2Group: null,
